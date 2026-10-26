@@ -1,0 +1,22 @@
+name: agent-foundation
+services:
+  api:
+    build: .
+    image: agent-foundation:local
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      APP_DATA_DIR: /app/data
+    volumes: [agent-data:/app/data]
+    ports: ['127.0.0.1:${APP_PORT:-8787}:8787']
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8787/readyz', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      start_period: 60s
+      retries: 12
+    init: true
+    restart: unless-stopped
+volumes:
+  agent-data:
